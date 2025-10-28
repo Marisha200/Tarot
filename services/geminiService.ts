@@ -1,10 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { TarotCardDetails } from '../types';
-import { API_KEY } from './config'; // Importa la clave desde el nuevo archivo
+import { API_KEY } from '../config'; // Se importa desde el nuevo config.ts
 
-if (!API_KEY || API_KEY === "TU_API_KEY_AQUI") {
-  throw new Error("API_KEY no configurada. Por favor, crea un archivo config.ts y añade tu clave de API.");
-}
+export const isApiKeyConfigured = (): boolean => {
+  return API_KEY !== "TU_API_KEY_AQUI" && API_KEY !== "";
+};
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
@@ -42,6 +42,10 @@ const schema = {
 };
 
 export const getCardDetails = async (cardName: string): Promise<TarotCardDetails> => {
+    if (!isApiKeyConfigured()) {
+        throw new Error("API Key no configurada. Por favor, sigue las instrucciones en la página de inicio.");
+    }
+    
     const prompt = `Genera una lección detallada y gamificada para la carta del Tarot: "${cardName}".`;
     
     try {
@@ -58,7 +62,6 @@ export const getCardDetails = async (cardName: string): Promise<TarotCardDetails
         const jsonText = response.text.trim();
         const data = JSON.parse(jsonText);
 
-        // Basic validation
         if (!data.name || !data.quiz || data.quiz.length === 0) {
             throw new Error("Invalid data structure received from API");
         }

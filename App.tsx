@@ -1,9 +1,10 @@
 
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { MAJOR_ARCANA, MINOR_ARCANA_SUITS } from './constants';
 import { CardDetail } from './components/CardDetail';
 import { Card } from './components/Card';
+import { ApiKeyInstructions } from './components/ApiKeyInstructions';
+import { isApiKeyConfigured } from './services/geminiService';
 import type { ArcanaType } from './types';
 
 const App: React.FC = () => {
@@ -11,13 +12,14 @@ const App: React.FC = () => {
   const [selectedArcana, setSelectedArcana] = useState<ArcanaType | null>(null);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [completedCards, setCompletedCards] = useState<Set<string>>(new Set());
+  const [apiKeyReady, setApiKeyReady] = useState<boolean>(false);
 
   useEffect(() => {
+    setApiKeyReady(isApiKeyConfigured());
+
     try {
       const storedProgress = localStorage.getItem('tarotProgress');
       if (storedProgress) {
-        // Fix: The error "Argument of type 'Set<unknown>' is not assignable to parameter of type 'Set<string>'" originates from loading untyped data.
-        // JSON.parse returns `any`, so we cast the result to `string[]` to ensure `completedCards` is correctly typed as `Set<string>`.
         setCompletedCards(new Set(JSON.parse(storedProgress) as string[]));
       }
     } catch (error) {
@@ -57,6 +59,10 @@ const App: React.FC = () => {
   const goBackToGrid = () => {
     setSelectedCard(null);
   };
+
+  if (!apiKeyReady) {
+    return <ApiKeyInstructions />;
+  }
 
   const renderDashboard = () => (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-gray-900 to-indigo-900">
