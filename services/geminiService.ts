@@ -1,10 +1,9 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { TarotCardDetails } from '../types';
+import { API_KEY } from './config'; // Importa la clave desde el nuevo archivo
 
-const API_KEY = process.env.API_KEY;
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set");
+if (!API_KEY || API_KEY === "TU_API_KEY_AQUI") {
+  throw new Error("API_KEY no configurada. Por favor, crea un archivo config.ts y añade tu clave de API.");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
