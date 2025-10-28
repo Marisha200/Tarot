@@ -1,0 +1,2 @@
+// config.ts
+export const API_KEY = "TU_API_KEY_AQUI";
